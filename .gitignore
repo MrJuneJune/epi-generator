@@ -2,3 +2,6 @@ life
 data
 can_not_use
 epi
+
+# shell script to start
+start.sh
