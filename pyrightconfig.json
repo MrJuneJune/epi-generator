@@ -1,0 +1,7 @@
+{
+  "venvPath": "./",
+  "venv": "./life",
+  "pythonVersion": "3.x",
+  "reportMissingTypeStubs": false,
+  "reportGeneralTypeIssues": false
+}
