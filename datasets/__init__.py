@@ -9,7 +9,9 @@ def init_dataloader():
         transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
     ])
-    
+
+    # Absollute path
+    # Don't look at the names xd 
     PATH_TO_EPI = '/Users/mingtongyuan/june/python/side_project/epi_generator/epi'
     
     dataset = ImageFolder(PATH_TO_EPI, transform=transform)
