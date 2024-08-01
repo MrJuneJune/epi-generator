@@ -5,3 +5,6 @@ epi
 
 # shell script to start
 start.sh
+
+# Any cache
+**/__pycache__/**
