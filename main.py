@@ -46,11 +46,11 @@ def initialize_models_and_optimizers(device):
 
     # Load weights if available
     if os.path.exists(generator_weights):
-        netG.load_state_dict(torch.load(generator_weights))
+        netG.load_state_dict(torch.load(generator_weights, weights_only=True))
         print("Loaded generator weights")
     
     if os.path.exists(discriminator_weights):
-        netD.load_state_dict(torch.load(discriminator_weights))
+        netD.load_state_dict(torch.load(discriminator_weights, weights_only=True))
         print("Loaded discriminator weights")
 
     return netD, netG, optimizerD, optimizerG, generator_weights, discriminator_weights
@@ -152,8 +152,8 @@ def show_real_images(dataloader):
 
 if __name__ == "__main__":
     netD, netG, optimizerD, optimizerG, generator_weights, discriminator_weights = initialize_models_and_optimizers(device)
-    img_list, G_losses, D_losses = train(dataloader, netD, netG, optimizerD, optimizerG, generator_weights, discriminator_weights)
-    plot_losses(G_losses, D_losses)
+    # img_list, G_losses, D_losses = train(dataloader, netD, netG, optimizerD, optimizerG, generator_weights, discriminator_weights)
+    # plot_losses(G_losses, D_losses)
     show_real_images(dataloader)
     show_generated_images(netG)
 

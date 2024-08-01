@@ -15,6 +15,12 @@ python --version # check if the version exists
 pip install -r requirements.txt
 ```
 
+or just
+
+```
+docker-compose up --build
+```
+
 ## If you want to test it,
 
 Update `PATH_TO_EPI` inside of the main.py and then run below codes.

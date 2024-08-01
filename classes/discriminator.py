@@ -1,5 +1,5 @@
 import torch.nn as nn
-from ..constants import ndf, nc
+from constants import ndf, nc
 
 class Discriminator(nn.Module):
     def __init__(self, ngpu):

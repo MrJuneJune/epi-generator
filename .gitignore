@@ -8,3 +8,6 @@ start.sh
 
 # Any cache
 **/__pycache__/**
+
+# folder options 
+.DS_Store

@@ -1,5 +1,5 @@
 import torch.nn as nn
-from ..constants import nz, ngf, nc
+from constants import nz, ngf, nc
 
 class Generator(nn.Module):
     def __init__(self, ngpu):
