@@ -41,8 +41,8 @@ def initialize_models_and_optimizers(device):
     model_save_path = "./models"
     os.makedirs(model_save_path, exist_ok=True)
 
-    generator_weights = os.path.join(model_save_path, 'generator_new.pth')
-    discriminator_weights = os.path.join(model_save_path, 'discriminator_new.pth')
+    generator_weights = os.path.join(model_save_path, 'generator_new_512.pth')
+    discriminator_weights = os.path.join(model_save_path, 'discriminator_new_512.pth')
 
     # Load weights if available
     if os.path.exists(generator_weights):
@@ -152,8 +152,8 @@ def show_real_images(dataloader):
 
 if __name__ == "__main__":
     netD, netG, optimizerD, optimizerG, generator_weights, discriminator_weights = initialize_models_and_optimizers(device)
-    # img_list, G_losses, D_losses = train(dataloader, netD, netG, optimizerD, optimizerG, generator_weights, discriminator_weights)
-    # plot_losses(G_losses, D_losses)
+    img_list, G_losses, D_losses = train(dataloader, netD, netG, optimizerD, optimizerG, generator_weights, discriminator_weights)
+    plot_losses(G_losses, D_losses)
     show_real_images(dataloader)
     show_generated_images(netG)
 
