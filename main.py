@@ -34,8 +34,8 @@ def initialize_models_and_optimizers(device):
         netD = nn.DataParallel(netD, list(range(ngpu)))
 
     # Setup Adam optimizers for both G and D
-    optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta1, 0.999))
-    optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta1, 0.999))
+    optimizerD = optim.AdamW(netD.parameters(), lr=lr, betas=(beta1, 0.999))
+    optimizerG = optim.AdamW(netG.parameters(), lr=lr, betas=(beta1, 0.999))
 
     # Model save path
     model_save_path = "./models"
@@ -67,6 +67,10 @@ def train(dataloader, netD, netG, optimizerD, optimizerG, generator_weights, dis
     D_losses = []
     iters = 0
 
+    dtype = torch.bfloat16 if torch.cuda.is_available() else torch.float32 # dtype bfloat16 only works with CUDA
+    netG = torch.compile(netG) #Torch compile 
+    netD = torch.compile(netD)
+
     for epoch in range(num_epochs):
         for i, data in enumerate(dataloader, 0):
             # Update Discriminator with real and fake data
@@ -74,16 +78,26 @@ def train(dataloader, netD, netG, optimizerD, optimizerG, generator_weights, dis
             real_cpu = data[0].to(device)
             b_size = real_cpu.size(0)
             label = torch.full((b_size,), real_label, device=device)
-            output = netD(real_cpu).view(-1)
-            errD_real = criterion(output, label)
+            # Faster compute on forward passes by sacrificing some precision
+            with torch.autocast(device_type=device, dtype=dtype): 
+                output = netD(real_cpu).view(-1)
+                errD_real = criterion(output, label)
+                # both real and fake data contribute to the loss so need to take average of the 2 losses
+                # or else gradient accumulation will be like 2x the intended lr 
+                errD_real = errD_real / 2 
+
             errD_real.backward()
             D_x = output.mean().item()
 
             noise = torch.randn(b_size, nz, 1, 1, device=device)
-            fake = netG(noise)
-            label.fill_(fake_label)
-            output = netD(fake.detach()).view(-1)
-            errD_fake = criterion(output, label)
+            with torch.autocast(device_type=device, dtype=dtype):
+                fake = netG(noise)
+                label.fill_(fake_label)
+                output = netD(fake.detach()).view(-1)
+                errD_fake = criterion(output, label)
+                # see above
+                errD_fake = errD_fake / 2 
+
             errD_fake.backward()
             D_G_z1 = output.mean().item()
             errD = errD_real + errD_fake
@@ -92,8 +106,9 @@ def train(dataloader, netD, netG, optimizerD, optimizerG, generator_weights, dis
             # Update Generator
             netG.zero_grad()
             label.fill_(real_label)
-            output = netD(fake).view(-1)
-            errG = criterion(output, label)
+            with torch.autocast(device_type=device, dtype=dtype):
+                output = netD(fake).view(-1)
+                errG = criterion(output, label)
             errG.backward()
             D_G_z2 = output.mean().item()
             optimizerG.step()
